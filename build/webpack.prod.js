@@ -31,7 +31,7 @@ module.exports = merge(common, {
     }),
     new MiniCssExtractPlugin({
       filename: "css/[name].[contenthash:8].css",
-      chunkFilename: "css/[name].[contenthash:8].css"
+      chunkFilename: "css/[name].[contenthash:8].css",
     }),
     new copyWebpackPlugin([{
         from: path.resolve(__dirname, "../src/assets"),

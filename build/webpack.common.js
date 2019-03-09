@@ -34,6 +34,7 @@ module.exports = {
           removeAttributeQuotes: true, 
       }
     }),
+
   ],
   output: {
     filename: devMode ? 'js/[name].[hash:8].js': 'js/[name].[chunkhash:8].js',
@@ -70,6 +71,7 @@ module.exports = {
             loader: devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
             options: {
               sourceMap: true,
+              publicPath: '../'
             }
           },
           {
@@ -88,7 +90,7 @@ module.exports = {
               ]
             }
           }
-        ]
+        ],
       },
       {
         test: /\.(gif|png|jpe?g|svg)$/i,
@@ -97,8 +99,8 @@ module.exports = {
             loader: 'url-loader',
             options: {
               limit: 8192,
-              name: 'img/[name].img.[hash:5].[ext]',
-              publicPath: './'
+              name: '[name].img.[hash:5].[ext]',
+              outputPath: 'img',
             }
           },
           {
@@ -129,7 +131,6 @@ module.exports = {
             loader: 'file-loader',
             options: {
               name: 'css/font/[name].font.[hash:6].[ext]',
-              publicPath: '../'
             }
           }
         ]
@@ -141,11 +142,11 @@ module.exports = {
             loader: 'html-loader',
             options: {
               attrs: ['img:src', 'img:data-src'],
-              publicPath: '/'
             }
           }
         ]
       }
     ]
   },  
+
 };
