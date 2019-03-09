@@ -1,0 +1,7 @@
+body {
+  background: url(images/1.jpg);
+  display: flex;
+}
+.hello {
+  color: red;
+}
