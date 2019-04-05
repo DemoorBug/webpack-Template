@@ -3,11 +3,12 @@ const devMode = process.env.NODE_ENV !== 'production'
 // const devMode = true
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
     index: './src/pages/index/index.js',
-    main: './src/pages/page1/main.js'
+    // main: './src/pages/page1/main.js'
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -17,23 +18,27 @@ module.exports = {
       hash: true,
       chunks: ['vendor','common','runtime','index'],
       minify: process.env.NODE_ENV !== "production" ? false : {
-          removeComments: true, 
-          // collapseWhitespace: true, 
-          removeAttributeQuotes: true, 
+          removeComments: true,
+          // collapseWhitespace: true,
+          removeAttributeQuotes: true,
       }
     }),
-    new HtmlWebpackPlugin({
+/*    new HtmlWebpackPlugin({
       template: './src/pages/page1/main.html',
       filename: 'main.html',
       inject: true,
       hash: true,
       chunks: ['vendor','common','runtime','main'],
       minify: process.env.NODE_ENV !== "production" ? false : {
-          removeComments: true, 
-          // collapseWhitespace: true, 
-          removeAttributeQuotes: true, 
+          removeComments: true,
+          // collapseWhitespace: true,
+          removeAttributeQuotes: true,
       }
-    }),
+    }),*/
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
+    })
 
   ],
   output: {
@@ -42,6 +47,15 @@ module.exports = {
     path: path.resolve(__dirname, '../dist'),
     publicPath: './'
   },
+  resolve: {
+    alias: {
+      // '@': resolve('src'),
+      '@': path.resolve(__dirname, '../src/'),
+      '~node': path.resolve(__dirname, '../node_modules/'),
+      '~css': path.resolve(__dirname, '../src/css/'),
+      // 'common': resolve('src/common')
+    }
+  },
   optimization: {
     runtimeChunk: 'single',
     splitChunks: {
@@ -49,7 +63,7 @@ module.exports = {
           vendor: { // 抽离第三方插件
               test: /node_modules/, // 指定是node_modules下的第三方包
               chunks: 'initial',
-              name: 'vendor', // 打包后的文件名，任意命名    
+              name: 'vendor', // 打包后的文件名，任意命名
               // 设置优先级，防止和自定义的公共代码提取时被覆盖，不进行打包
               priority: 10
           },
@@ -65,12 +79,13 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
+        test: /\.(less|css)$/,
         use: [
           {
             loader: devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
-            options: {
+            options: devMode ? {
               sourceMap: true,
+            } : {
               publicPath: '../'
             }
           },
@@ -89,14 +104,21 @@ module.exports = {
                 require('postcss-preset-env')()
               ]
             }
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              sourceMap: true
+            }
           }
         ],
       },
       {
         test: /\.(gif|png|jpe?g|svg)$/i,
         use: [
-          { 
+          {
             loader: 'url-loader',
+            // loader: 'file-loader',
             options: {
               limit: 8192,
               name: '[name].img.[hash:5].[ext]',
@@ -139,14 +161,22 @@ module.exports = {
         test: /\.html$/,
         use: [
           {
-            loader: 'html-loader',
+            loader: 'html-loader?config=raw-loader',
             options: {
               attrs: ['img:src', 'img:data-src'],
             }
+          },
+        ]
+      },
+      {
+        test: /\.js$/,
+        use: [
+          {
+            loader: 'babel-loader'
           }
         ]
       }
     ]
-  },  
+  },
 
 };

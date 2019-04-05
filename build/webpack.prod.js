@@ -5,21 +5,23 @@ const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+// const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const Purifycss = require('purifycss-webpack')
+// const Purifycss = require('purifycss-webpack')
+const PurgecssPlugin = require('purgecss-webpack-plugin')
 const glob = require('glob-all')
 const copyWebpackPlugin = require("copy-webpack-plugin");
+
+const PATHS = {
+  src: path.join(__dirname, '../src')
+}
 
 module.exports = merge(common, {
   mode: 'production',
   optimization: {
     minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: true // set to true if you want JS source maps
-      }),
+      new TerserPlugin(),
       new OptimizeCSSAssetsPlugin({})
     ]
   },
@@ -43,11 +45,20 @@ module.exports = merge(common, {
         to: './',
         ignore: ['.*']
     }]),
-    new Purifycss({
-      paths: glob.sync([
-        path.join(__dirname, '../src/*.html'),
-        path.join(__dirname, '../src/*.js')
-      ])
+    // new Purifycss({
+    //   paths: glob.sync([
+    //     path.join(__dirname, '../src/pages/*/*.html'),
+    //     path.join(__dirname, '../src/pages/*/*.js')
+    //   ]),
+    //   purifyOptions: {
+    //     whitelist: ['slick.less','slick-theme.less']
+    //   }
+    // }),
+
+    new PurgecssPlugin({
+      paths: glob.sync(`${PATHS.src}/pages/*/*`,  { nodir: true }),
+      //白名单css，正则匹配css
+      whitelistPatterns: [/^(slick)/]
     }),
   ]
 });
